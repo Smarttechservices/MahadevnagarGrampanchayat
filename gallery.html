@@ -658,6 +658,8 @@ async function loadGallery() {
 }
 
 
+//below function is ready according to the cloudinary.
+
 function renderGallery(images) {
   const galleryGrid = document.getElementById('galleryGrid');
   if (!galleryGrid) {
@@ -668,32 +670,68 @@ function renderGallery(images) {
   galleryGrid.innerHTML = '';
 
   images.forEach(img => {
-    const apiPath = window.APP_CONFIG.apiImgUrl;
-    const src = apiPath + img.filepath;
+    const src = img.filepath; // Cloudinary URL now
     const caption = img.caption || '';
     const title = img.title || '';
 
-    // Create container div
     const wrapper = document.createElement('div');
     wrapper.classList.add('gallery-item');
 
-    // Create anchor element for lightbox
     const a = document.createElement('a');
     a.href = src;
     a.setAttribute('data-lightbox', 'models');
     a.setAttribute('data-title', caption);
 
-    // Create image element
     const imageEl = document.createElement('img');
     imageEl.src = src;
     imageEl.alt = title;
-    imageEl.classList.add('gimg')
-    // Nest elements
+    imageEl.classList.add('gimg');
+
     a.appendChild(imageEl);
     wrapper.appendChild(a);
     galleryGrid.appendChild(wrapper);
   });
 }
+
+
+
+// function renderGallery(images) {
+//   const galleryGrid = document.getElementById('galleryGrid');
+//   if (!galleryGrid) {
+//     console.error('No #galleryGrid element found');
+//     return;
+//   }
+
+//   galleryGrid.innerHTML = '';
+
+//   images.forEach(img => {
+//     const apiPath = window.APP_CONFIG.apiImgUrl;
+//     const src = apiPath + img.filepath;
+//     const caption = img.caption || '';
+//     const title = img.title || '';
+
+//     // Create container div
+//     const wrapper = document.createElement('div');
+//     wrapper.classList.add('gallery-item');
+
+//     // Create anchor element for lightbox
+//     const a = document.createElement('a');
+//     a.href = src;
+//     a.setAttribute('data-lightbox', 'models');
+//     a.setAttribute('data-title', caption);
+
+//     // Create image element
+//     const imageEl = document.createElement('img');
+//     imageEl.src = src;
+//     imageEl.alt = title;
+//     imageEl.classList.add('gimg')
+//     // Nest elements
+//     a.appendChild(imageEl);
+//     wrapper.appendChild(a);
+//     galleryGrid.appendChild(wrapper);
+//   });
+// }
+
 
 
 

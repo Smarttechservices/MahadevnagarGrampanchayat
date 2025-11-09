@@ -681,7 +681,8 @@ function loadGalleryImages() {
 
       let row;
       data.forEach((img, index) => {
-        const fullUrl = apiImgPath + img.filepath;
+        const fullUrl = img.filepath;
+        // const fullUrl = apiImgPath + img.filepath;
         const caption = img.caption || '';
         const title = img.title || '';
 

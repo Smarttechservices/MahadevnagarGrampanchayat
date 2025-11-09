@@ -397,78 +397,135 @@
 
 
      //--------------------------------------Api Implementation-----------------------------------
+const adminLoginForm = document.getElementById('adminLoginForm');
+const loaderOverlay = document.getElementById('loaderOverlay');
+const message = document.getElementById('loginMessage');
+const loginBtn = document.querySelector('#loginbtn');
+
+if (adminLoginForm) {
+  adminLoginForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    message.textContent = "";
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!username || !password) {
+      message.textContent = "Please enter both Username and Password.";
+      return;
+    }
+
+    // Show loader & disable form controls
+    if (loaderOverlay) loaderOverlay.style.display = "flex";
+    if (loginBtn) loginBtn.disabled = true;
+
+    try {
+      const apiPath = window.APP_CONFIG.apiBaseUrl;
+
+      const resp = await fetchWithTimeout(apiPath + 'admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      }, 60000); // 60s timeout for Render cold start
+
+      if (!resp.ok) {
+        const errorData = await resp.json().catch(() => ({}));
+        message.textContent = errorData.message || "Invalid credentials, login failed!";
+        return;
+      }
+
+      const data = await resp.json();
+      localStorage.setItem('adminToken', data.token); // Save JWT
+
+      // Redirect to dashboard (same tab)
+      window.location.href = "AdminDashboard.html";
+
+    } catch (error) {
+      if (error.message === 'timeout') {
+        message.textContent = "Server is starting up. Please wait a minute and try again.";
+      } else {
+        message.textContent = "Server not responding. Please try again later.";
+      }
+      console.error("Login error:", error);
+
+    } finally {
+      if (loaderOverlay) loaderOverlay.style.display = "none";
+      if (loginBtn) loginBtn.disabled = false;
+    }
+  });
+}
 
 
     
   // Admin Login Implementation
-  const adminLoginForm = document.getElementById('adminLoginForm');
-  const loaderOverlay = document.getElementById('loaderOverlay');
-  const message = document.getElementById('loginMessage');
-  const loginBtn = document.querySelector('#loginbtn');
-  // const loginModalEl = document.getElementById('loginModal');
+  // const adminLoginForm = document.getElementById('adminLoginForm');
+  // const loaderOverlay = document.getElementById('loaderOverlay');
+  // const message = document.getElementById('loginMessage');
+  // const loginBtn = document.querySelector('#loginbtn');
+  // // const loginModalEl = document.getElementById('loginModal');
 
-  // if (!loginModalEl) {
-  //   console.warn("loginModal element not found");
-  // }
+  // // if (!loginModalEl) {
+  // //   console.warn("loginModal element not found");
+  // // }
 
-  // 1) Submit/login handler (keeps your loader + fetch logic)
-  if (adminLoginForm) {
-    adminLoginForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      message.textContent = "";
+  // // 1) Submit/login handler (keeps your loader + fetch logic)
+  // if (adminLoginForm) {
+  //   adminLoginForm.addEventListener('submit', async function (e) {
+  //     e.preventDefault();
+  //     message.textContent = "";
 
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
+  //     const username = document.getElementById('username').value.trim();
+  //     const password = document.getElementById('password').value.trim();
 
-      if (!username || !password) {
-        message.textContent = "Please Enter Both || Username and Password.";
-        return;
-      }
+  //     if (!username || !password) {
+  //       message.textContent = "Please Enter Both || Username and Password.";
+  //       return;
+  //     }
 
-      // Show loader & disable form controls
-      if (loaderOverlay) loaderOverlay.style.display = "flex";
-      if (loginBtn) loginBtn.disabled = true;
+  //     // Show loader & disable form controls
+  //     if (loaderOverlay) loaderOverlay.style.display = "flex";
+  //     if (loginBtn) loginBtn.disabled = true;
 
-      try {
-        const apiPath = window.APP_CONFIG.apiBaseUrl;
-        const resp = await fetchWithTimeout(apiPath + 'admin/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })}, 60000);
-        // });
+  //     try {
+  //       const apiPath = window.APP_CONFIG.apiBaseUrl;
+  //       const resp = await fetchWithTimeout(apiPath + 'admin/login', {
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify({ username, password })}, 60000);
+  //       // });
 
-        if (!resp.ok) {
-          const errorData = await resp.json().catch(() => ({}));
-          message.textContent = errorData.message || "Invalid credentials, login failed!";
-          return;
-        }
+  //       if (!resp.ok) {
+  //         const errorData = await resp.json().catch(() => ({}));
+  //         message.textContent = errorData.message || "Invalid credentials, login failed!";
+  //         return;
+  //       }
 
-        const data = await resp.json();
-        localStorage.setItem('adminToken', data.token);
+  //       const data = await resp.json();
+  //       localStorage.setItem('adminToken', data.token);
 
-        // success: open dashboard in new tab
-        window.location.assign("AdminDashboard.html");
+  //       // success: open dashboard in new tab
+  //       window.location.assign("AdminDashboard.html");
 
        
-      } catch (error) {
-        // message.textContent = "Server not responding. Please try again later.";
-        // console.error("Login error:", error);
+  //     } catch (error) {
+  //       // message.textContent = "Server not responding. Please try again later.";
+  //       // console.error("Login error:", error);
 
-          if (error.message === 'timeout') {
-            message.textContent = "Server is starting up. Please wait a minute and try again.";
-          } else {
-            message.textContent = "Server not responding.Please try again later";
-          }
-          console.error("Login error:", error);
+  //         if (error.message === 'timeout') {
+  //           message.textContent = "Server is starting up. Please wait a minute and try again.";
+  //         } else {
+  //           message.textContent = "Server not responding.Please try again later";
+  //         }
+  //         console.error("Login error:", error);
 
-      } 
-      finally {
-        // always clear loader / enable button (closing will also reset but keep this safe)
-        if (loaderOverlay) loaderOverlay.style.display = "none";
-        if (loginBtn) loginBtn.disabled = false;
-      }
-    });
-  }
+  //     } 
+  //     finally {
+  //       // always clear loader / enable button (closing will also reset but keep this safe)
+  //       if (loaderOverlay) loaderOverlay.style.display = "none";
+  //       if (loginBtn) loginBtn.disabled = false;
+  //     }
+  //   });
+  // }
 
 
   // 3) Optional nicety: clear message when user focuses any input (so error disappears as they edit)
