@@ -1216,7 +1216,7 @@ footer {
 
 
   /* Navbar */
-  .mobile-nav-toggle { display: block; margin-left: auto; margin-right: 25px; }
+  .mobile-nav-toggle { display: block; margin-left: auto; margin-right: 25px; color: white; background-color: rgba(145, 7, 7, 0.87); padding: 4px 13px; border-radius: 8px;}
   nav ul {
     display: none;
     flex-direction: column;
